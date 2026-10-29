@@ -1,5 +1,7 @@
 package ru.praktikum.api;
 
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import ru.praktikum.api.model.OrderRequest;
@@ -20,7 +22,7 @@ public class OrderCreationTest extends ApiTest {
     public void authorisedOrderWithIngredientsIsCreated() {
         createUser(uniqueUser());
         api.createOrder(token, new OrderRequest(validIngredients()))
-                .then().statusCode(200).body("success", equalTo(true))
+                .then().statusCode(SC_OK).body("success", equalTo(true))
                 .body("order.number", greaterThan(0));
     }
 
@@ -28,7 +30,7 @@ public class OrderCreationTest extends ApiTest {
     @Description("Уточнение эксперта курса от 26.10.2026: для заказа без авторизации допускается ответ 200")
     public void orderWithoutAuthorisationIsCreated() {
         api.createOrder(null, new OrderRequest(validIngredients()))
-                .then().statusCode(200).body("success", equalTo(true))
+                .then().statusCode(SC_OK).body("success", equalTo(true))
                 .body("order.number", greaterThan(0));
     }
 
@@ -36,14 +38,14 @@ public class OrderCreationTest extends ApiTest {
     public void emptyIngredientListIsRejected() {
         createUser(uniqueUser());
         api.createOrder(token, new OrderRequest(Collections.emptyList()))
-                .then().statusCode(400).body("success", equalTo(false))
+                .then().statusCode(SC_BAD_REQUEST).body("success", equalTo(false))
                 .body("message", equalTo("Ingredient ids must be provided"));
     }
 
     @Test
     public void missingIngredientFieldIsRejected() {
         createUser(uniqueUser());
-        api.createOrder(token, new OrderRequest(null)).then().statusCode(400)
+        api.createOrder(token, new OrderRequest(null)).then().statusCode(SC_BAD_REQUEST)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Ingredient ids must be provided"));
     }
@@ -53,6 +55,6 @@ public class OrderCreationTest extends ApiTest {
     public void invalidIngredientHashIsRejected() {
         createUser(uniqueUser());
         api.createOrder(token, new OrderRequest(List.of("invalid-hash")))
-                .then().statusCode(400).body("success", equalTo(false));
+                .then().statusCode(SC_BAD_REQUEST).body("success", equalTo(false));
     }
 }

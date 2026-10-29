@@ -1,5 +1,7 @@
 package ru.praktikum.api;
 
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import io.qameta.allure.Description;
 import ru.praktikum.api.model.UserRequest;
 import org.junit.Test;
@@ -10,7 +12,7 @@ public class UserRegistrationTest extends ApiTest {
     @Description("Уникальный пользователь регистрируется и получает токены и свои данные")
     public void createUniqueUser() {
         UserRequest user = uniqueUser();
-        registerAndRemember(user).then().statusCode(200)
+        registerAndRemember(user).then().statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("user.email", equalTo(user.getEmail()))
                 .body("user.name", equalTo(user.getName()))
@@ -23,7 +25,7 @@ public class UserRegistrationTest extends ApiTest {
     public void duplicateUserIsRejected() {
         UserRequest user = uniqueUser();
         createUser(user);
-        api.register(user).then().statusCode(403)
+        api.register(user).then().statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("User already exists"));
     }

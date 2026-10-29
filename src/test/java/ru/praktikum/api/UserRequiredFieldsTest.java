@@ -1,5 +1,6 @@
 package ru.praktikum.api;
 
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import java.util.Arrays;
 import java.util.Collection;
 import ru.praktikum.api.model.UserRequest;
@@ -36,7 +37,7 @@ public class UserRequiredFieldsTest extends ApiTest {
             case "name": user.setName(value); break;
             default: throw new IllegalArgumentException("Неизвестное поле: " + field);
         }
-        registerAndRemember(user).then().statusCode(403)
+        registerAndRemember(user).then().statusCode(SC_FORBIDDEN)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
     }

@@ -1,5 +1,7 @@
 package ru.praktikum.api;
 
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_ACCEPTED;
 import io.restassured.response.Response;
 import io.qameta.allure.Step;
 import ru.praktikum.api.model.UserRequest;
@@ -28,7 +30,7 @@ public abstract class ApiTest {
 
     @Step("Создать пользователя для проверки")
     protected void createUser(UserRequest user) {
-        registerAndRemember(user).then().statusCode(200)
+        registerAndRemember(user).then().statusCode(SC_OK)
                 .body("success", equalTo(true))
                 .body("accessToken", not(isEmptyOrNullString()));
     }
@@ -37,7 +39,7 @@ public abstract class ApiTest {
     @Step("Удалить пользователя, созданного в текущем тесте")
     public void deleteOnlyCreatedTestUser() {
         if (token != null) {
-            api.deleteUser(token).then().statusCode(202).body("success", equalTo(true));
+            api.deleteUser(token).then().statusCode(SC_ACCEPTED).body("success", equalTo(true));
         }
     }
 }

@@ -1,5 +1,6 @@
 package ru.praktikum.api;
 
+import static org.apache.http.HttpStatus.SC_OK;
 import io.qameta.allure.Step;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -47,7 +48,7 @@ public class ApiClient {
     @Step("Получить идентификаторы ингредиентов")
     public List<String> ingredientIds() {
         return given().spec(spec).get("/api/ingredients")
-                .then().statusCode(200).extract().jsonPath().getList("data._id");
+                .then().statusCode(SC_OK).extract().jsonPath().getList("data._id");
     }
 
     @Step("Создать заказ")
