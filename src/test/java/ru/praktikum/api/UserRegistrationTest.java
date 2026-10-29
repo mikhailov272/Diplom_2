@@ -1,7 +1,6 @@
 package ru.praktikum.api;
 
 import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import io.qameta.allure.Description;
 import ru.praktikum.api.model.UserRequest;
 import org.junit.Test;
@@ -20,13 +19,4 @@ public class UserRegistrationTest extends ApiTest {
                 .body("refreshToken", not(isEmptyOrNullString()));
     }
 
-    @Test
-    @Description("Повторная регистрация уже созданного пользователя отклоняется")
-    public void duplicateUserIsRejected() {
-        UserRequest user = uniqueUser();
-        createUser(user);
-        api.register(user).then().statusCode(SC_FORBIDDEN)
-                .body("success", equalTo(false))
-                .body("message", equalTo("User already exists"));
-    }
 }

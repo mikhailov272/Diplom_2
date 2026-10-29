@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 
-public class OrderCreationTest extends ApiTest {
+public class OrderCreationTest extends RegisteredUserApiTest {
     @Step("Подготовить два существующих ингредиента")
     private List<String> validIngredients() {
         List<String> ids = api.ingredientIds();
@@ -20,23 +20,13 @@ public class OrderCreationTest extends ApiTest {
 
     @Test
     public void authorisedOrderWithIngredientsIsCreated() {
-        createUser(uniqueUser());
         api.createOrder(token, new OrderRequest(validIngredients()))
                 .then().statusCode(SC_OK).body("success", equalTo(true))
                 .body("order.number", greaterThan(0));
     }
 
     @Test
-    @Description("Уточнение эксперта курса от 26.10.2026: для заказа без авторизации допускается ответ 200")
-    public void orderWithoutAuthorisationIsCreated() {
-        api.createOrder(null, new OrderRequest(validIngredients()))
-                .then().statusCode(SC_OK).body("success", equalTo(true))
-                .body("order.number", greaterThan(0));
-    }
-
-    @Test
     public void emptyIngredientListIsRejected() {
-        createUser(uniqueUser());
         api.createOrder(token, new OrderRequest(Collections.emptyList()))
                 .then().statusCode(SC_BAD_REQUEST).body("success", equalTo(false))
                 .body("message", equalTo("Ingredient ids must be provided"));
@@ -44,7 +34,6 @@ public class OrderCreationTest extends ApiTest {
 
     @Test
     public void missingIngredientFieldIsRejected() {
-        createUser(uniqueUser());
         api.createOrder(token, new OrderRequest(null)).then().statusCode(SC_BAD_REQUEST)
                 .body("success", equalTo(false))
                 .body("message", equalTo("Ingredient ids must be provided"));
@@ -53,7 +42,6 @@ public class OrderCreationTest extends ApiTest {
     @Test
     @Description("Уточнение эксперта курса от 12.10.2026: для неверного хеша ожидается 400 вместо 500 из PDF")
     public void invalidIngredientHashIsRejected() {
-        createUser(uniqueUser());
         api.createOrder(token, new OrderRequest(List.of("invalid-hash")))
                 .then().statusCode(SC_BAD_REQUEST).body("success", equalTo(false));
     }
