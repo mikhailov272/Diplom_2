@@ -2,7 +2,7 @@ package ru.praktikum.api;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
+import ru.praktikum.api.model.UserRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,11 +28,13 @@ public class UserRequiredFieldsTest extends ApiTest {
 
     @Test
     public void registrationRequiresEveryMandatoryField() {
-        Map<String, String> user = uniqueUser();
-        if (omit) {
-            user.remove(field);
-        } else {
-            user.put(field, "");
+        UserRequest user = uniqueUser();
+        String value = omit ? null : "";
+        switch (field) {
+            case "email": user.setEmail(value); break;
+            case "password": user.setPassword(value); break;
+            case "name": user.setName(value); break;
+            default: throw new IllegalArgumentException("Неизвестное поле: " + field);
         }
         registerAndRemember(user).then().statusCode(403)
                 .body("success", equalTo(false))

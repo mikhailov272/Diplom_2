@@ -1,8 +1,8 @@
 package ru.praktikum.api;
 
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
+import io.qameta.allure.Step;
+import ru.praktikum.api.model.UserRequest;
 import java.util.UUID;
 import org.junit.After;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,27 +13,28 @@ public abstract class ApiTest {
     protected final ApiClient api = new ApiClient();
     protected String token;
 
-    protected Map<String, String> uniqueUser() {
-        Map<String, String> user = new HashMap<>();
-        user.put("email", "qa-" + UUID.randomUUID() + "@example.com");
-        user.put("password", "TestPassword123");
-        user.put("name", "Test User");
-        return user;
+    @Step("Подготовить уникальные данные пользователя")
+    protected UserRequest uniqueUser() {
+        return new UserRequest("qa-" + UUID.randomUUID() + "@example.com",
+                "TestPassword123", "Test User");
     }
 
-    protected Response registerAndRemember(Map<String, String> user) {
+    @Step("Зарегистрировать пользователя и сохранить токен для уборки")
+    protected Response registerAndRemember(UserRequest user) {
         Response response = api.register(user);
         token = response.jsonPath().getString("accessToken");
         return response;
     }
 
-    protected void createUser(Map<String, String> user) {
+    @Step("Создать пользователя для проверки")
+    protected void createUser(UserRequest user) {
         registerAndRemember(user).then().statusCode(200)
                 .body("success", equalTo(true))
                 .body("accessToken", not(isEmptyOrNullString()));
     }
 
     @After
+    @Step("Удалить пользователя, созданного в текущем тесте")
     public void deleteOnlyCreatedTestUser() {
         if (token != null) {
             api.deleteUser(token).then().statusCode(202).body("success", equalTo(true));

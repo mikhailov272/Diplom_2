@@ -1,5 +1,6 @@
 package ru.praktikum.api;
 
+import io.qameta.allure.Step;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.HttpClientConfig;
@@ -8,7 +9,9 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.List;
-import java.util.Map;
+import ru.praktikum.api.model.UserRequest;
+import ru.praktikum.api.model.LoginRequest;
+import ru.praktikum.api.model.OrderRequest;
 import static io.restassured.RestAssured.given;
 
 public class ApiClient {
@@ -26,24 +29,29 @@ public class ApiClient {
                 .build();
     }
 
-    public Response register(Map<String, String> user) {
+    @Step("Зарегистрировать пользователя")
+    public Response register(UserRequest user) {
         return given().spec(spec).body(user).post("/api/auth/register");
     }
 
-    public Response login(Map<String, String> credentials) {
+    @Step("Войти с учётными данными пользователя")
+    public Response login(LoginRequest credentials) {
         return given().spec(spec).body(credentials).post("/api/auth/login");
     }
 
+    @Step("Удалить созданного тестового пользователя")
     public Response deleteUser(String token) {
         return given().spec(spec).header("Authorization", token).delete("/api/auth/user");
     }
 
+    @Step("Получить идентификаторы ингредиентов")
     public List<String> ingredientIds() {
         return given().spec(spec).get("/api/ingredients")
                 .then().statusCode(200).extract().jsonPath().getList("data._id");
     }
 
-    public Response createOrder(String token, Map<String, ?> body) {
+    @Step("Создать заказ")
+    public Response createOrder(String token, OrderRequest body) {
         RequestSpecification request = given().spec(spec).body(body);
         if (token != null) {
             request.header("Authorization", token);

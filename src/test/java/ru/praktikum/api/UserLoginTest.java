@@ -2,8 +2,8 @@ package ru.praktikum.api;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import ru.praktikum.api.model.UserRequest;
+import ru.praktikum.api.model.LoginRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,16 +28,16 @@ public class UserLoginTest extends ApiTest {
 
     @Test
     public void loginChecksEmailAndPassword() {
-        Map<String, String> user = uniqueUser();
+        UserRequest user = uniqueUser();
         createUser(user);
-        Map<String, String> credentials = new HashMap<>();
-        credentials.put("email", correctEmail ? user.get("email") : "wrong-" + user.get("email"));
-        credentials.put("password", correctPassword ? user.get("password") : "WrongPassword123");
+        LoginRequest credentials = new LoginRequest(
+                correctEmail ? user.getEmail() : "wrong-" + user.getEmail(),
+                correctPassword ? user.getPassword() : "WrongPassword123");
         if (correctEmail && correctPassword) {
             api.login(credentials).then().statusCode(200)
                     .body("success", equalTo(true))
-                    .body("user.email", equalTo(user.get("email")))
-                    .body("user.name", equalTo(user.get("name")))
+                    .body("user.email", equalTo(user.getEmail()))
+                    .body("user.name", equalTo(user.getName()))
                     .body("accessToken", startsWith("Bearer "))
                     .body("refreshToken", not(isEmptyOrNullString()));
         } else {

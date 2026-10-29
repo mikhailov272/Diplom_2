@@ -2,6 +2,10 @@
 
 Java 11, Maven, JUnit 4, REST Assured, Allure.
 
+Тела запросов задаются моделями `UserRequest`, `LoginRequest`, `OrderRequest`
+и сериализуются Jackson. Шаги отмечены `@Step`; AspectJ подключён в Maven Surefire.
+При `null` поле модели не отправляется, пустая строка или список сохраняются в JSON.
+
 ```sh
 mvn clean test
 mvn allure:report
@@ -39,9 +43,10 @@ mvn allure:report
 
 ## Текущий результат
 
-26.10.2026: повторный полный `mvn clean test` после уточнений — 17 PASSED,
+29.10.2026: полный `mvn clean test` после добавления моделей запросов и шагов Allure — 17 PASSED,
 0 FAILED, 0 BROKEN, 0 SKIPPED. Созданные пользователи удалены;
 ошибок уборки не было.
+Окружение прогона: macOS 27.0.1, Amazon Corretto 11.0.31. API-тесты выполняются без браузера.
 
 Исходные данные Allure: `target/allure-results`. HTML-отчёт после
 `mvn allure:report`: `target/site/allure-maven-plugin/index.html`.
@@ -49,7 +54,7 @@ mvn allure:report
 
 ## Сохранённый отчёт
 
-В `allure-results/` сохранены результаты прогона 26.10.2026 — все 17 тестов.
+В `allure-results/` сохранены результаты прогона 29.10.2026 — все 17 тестов.
 Пароли и токены в HTTP-вложениях скрыты. Для просмотра без повторного запуска
 тестов выполните из корня проекта:
 
